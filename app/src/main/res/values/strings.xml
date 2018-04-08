@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name"></string>
+    <string name="valueTestView">TEST!</string>
+    <string name="Add">Add</string>
+    <string name="description">Description</string>Example Card View and Recycler View
+</resources>
