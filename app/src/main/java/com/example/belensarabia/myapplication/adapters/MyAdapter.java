@@ -1,8 +1,11 @@
 package com.example.belensarabia.myapplication.adapters;
 
-import android.content.Context;
+import android.app.Activity;
 import android.support.v7.widget.RecyclerView;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -22,14 +25,18 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
 
     private List<Movie> movies;
     private int layout;
+    private Activity activity;
+
     private OnItemClickListener listener;
 
-    private Context context;
 
-    public MyAdapter(List<Movie> movies, int layout, OnItemClickListener listener) {
+    public MyAdapter(List<Movie> movies, int layout, Activity activity, OnItemClickListener listener) {
+
         this.movies = movies;
         this.layout = layout;
+        this.activity = activity;
         this.listener = listener;
+
     }
 
     @Override
@@ -37,7 +44,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
 
         View v = LayoutInflater.from(parent.getContext()).inflate(layout, parent, false);
         ViewHolder vh = new ViewHolder(v);
-        context = parent.getContext();
+
         return vh;
     }
 
@@ -50,33 +57,71 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
 
     @Override
     public int getItemCount() {
+
         return movies.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener, MenuItem.OnMenuItemClickListener {
 
         private TextView textViewName;
         private ImageView imageViewPoster;
+        private TextView textViewPunctuation;
+
 
         public ViewHolder(View itemView) {
             super(itemView);
             textViewName = itemView.findViewById(R.id.testViewTitle);
             imageViewPoster = itemView.findViewById(R.id.imageViewPoster);
+            textViewPunctuation = itemView.findViewById(R.id.textViewPunctuation);
+
+            // Register oncreate menu listener
+            itemView.setOnCreateContextMenuListener(this);
         }
 
         public void bind(final Movie movie, final OnItemClickListener listener) {
 
-            textViewName.setText(movie.getName());
-            Picasso.with(context).load(movie.getPoster()).fit().into(imageViewPoster);
-            //imageViewPoster.setImageResource(movie.getPoster());
+            this.textViewName.setText(movie.getName());
 
-            itemView.setOnClickListener(new View.OnClickListener() {
+            this.textViewPunctuation.setText(String.valueOf(movie.getPunctuation()));
+            Picasso.with(activity).load(movie.getPoster()).fit().into(imageViewPoster);
 
+
+            this.imageViewPoster.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(View v) {
+                public void onClick(View view) {
                     listener.onItemClick(movie, getAdapterPosition());
                 }
             });
+
+        }
+
+        @Override
+        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+
+            Movie movieSelected = movies.get(this.getAdapterPosition());
+
+            menu.setHeaderTitle(movieSelected.getName());
+
+
+            MenuInflater inflater = activity.getMenuInflater();
+            inflater.inflate(R.menu.context_menu_movie, menu);
+
+            for (int i = 0; i < menu.size(); i++)
+                menu.getItem(i).setOnMenuItemClickListener(this);
+
+        }
+
+
+        public boolean onMenuItemClick(MenuItem item) {
+
+            switch (item.getItemId()) {
+                case R.id.delete_movie:
+                    movies.remove(getAdapterPosition());
+                    notifyItemRemoved(getAdapterPosition());
+                    return true;
+                default:
+                    return false;
+            }
         }
     }
 

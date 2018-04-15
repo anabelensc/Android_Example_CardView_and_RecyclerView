@@ -8,13 +8,17 @@ public class Movie {
 
     private String name;
     private int poster;
+    private int punctuation;
+
+    private static final int LIMIT_PUNCTUATION = 10;
 
     public Movie() {
     }
 
-    public Movie(String name, int poster) {
+    public Movie(String name, int poster, int punctuation) {
         this.name = name;
         this.poster = poster;
+        this.punctuation = punctuation;
     }
 
     public String getName() {
@@ -25,6 +29,10 @@ public class Movie {
         return poster;
     }
 
+    public int getPunctuation() {
+        return punctuation;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -32,4 +40,14 @@ public class Movie {
     public void setPoster(int poster) {
         this.poster = poster;
     }
+
+    public void setPunctuation(int punctuation) {
+        this.punctuation = punctuation;
+    }
+
+    public void addPunctation(int punctuation) {
+        if (this.punctuation < LIMIT_PUNCTUATION)
+            this.punctuation += punctuation;
+    }
+
 }
